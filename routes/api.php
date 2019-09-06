@@ -18,4 +18,5 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::resource('tragos', 'TragosController');
+Route::resource('pedidos', 'PedidosController');
 
