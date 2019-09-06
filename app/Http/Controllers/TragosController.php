@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Trago;
+use Validator;
+
 
 class TragosController extends Controller
 {
@@ -27,6 +29,8 @@ class TragosController extends Controller
         //
     }
 
+    
+
     /**
      * Store a newly created resource in storage.
      *
@@ -35,13 +39,38 @@ class TragosController extends Controller
      */
     public function store(Request $request)
     {
-        //instanciamos la clase
-        $trago = new Trago();
-        //Declaramos el nombre con el nombre enviado en el request 
-        $trago->name = $request->name;
-        $trago->description = $request->description;
-        //Guardmos el cambio en nuestro modelo
-        $trago->save();
+       $input = $request->all();
+
+       $validator = Validator::make($input,[
+            'name' => 'required',
+            'description' => 'required',
+            'price' =>'required'
+       ]);
+
+       if($validator->fails()){
+           $response = [
+               'success' => false,
+               'data' => 'Validator Error',
+               'message' => $validator->errors()
+           ];
+
+           return response()->json($response, 404);
+       }
+
+
+       $trago = Trago::create($input);
+
+       $data = $trago->toArray();
+
+       $response = [
+           'success' => true,
+           'data' => $data,
+           'message' => 'Trago agregado a la carta'
+       ];
+
+       return response()->json($response, 200);
+
+        
     }
 
     /**
@@ -53,7 +82,8 @@ class TragosController extends Controller
     public function show($id)
     {
         //Solicitamos al modelo el Trago con el id selicitado por GET
-        return Trago::where('id', $id)->get();
+        $trago = Trago::findOrFail($id);
+        return $trago->pedidos;
     }
 
     /**
@@ -64,7 +94,8 @@ class TragosController extends Controller
      */
     public function edit($id)
     {
-        //
+        //busca los datos para editarlos
+
     }
 
     /**
@@ -76,7 +107,42 @@ class TragosController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $trago = Trago::find($id);
+        //recibe los datos y los edita
+        $input = $request->all();
+
+        $validator = Validator::make($input,[
+            'name' => 'required',
+            'description' => 'required'
+        ]);
+
+        if($validator->fails()){
+            $response = [
+                'success' => false,
+                'data' => 'Validation Error.',
+                'message' => $validator->errors()
+            ];
+
+            return response()->json($response, 404);
+        }
+
+        $trago->name = $input['name'];
+        $trago->description = $input['description'];
+        $trago->save();
+        
+        $data = $trago->toArray();
+        
+        $response = [
+            'success' => true,
+            'data' => $data,
+            'message' => 'Trago actualizado correctamente.'
+        ];
+
+        return response()->json($response, 200);
+
+
+        
+
     }
 
     /**
@@ -87,6 +153,21 @@ class TragosController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $trago = Trago::find($id);
+        $trago->delete();
+
+        $data = $trago->toArray();
+
+        $response = [
+            'success' => true,
+            'data' => $data,
+            'message' => 'Trago eliminado'
+        ];
+
+        return response()->json($response, 200);
     }
+
+    
+
+
 }

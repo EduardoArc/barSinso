@@ -14,3 +14,15 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/tragospedido', function () {
+    $trago = App\Trago::findOrFail(1);
+    return $trago->pedidos;
+});
+
+Route::get('/pedidostrago', function () {
+    $pedido= App\Pedido::findOrFail(1);
+    
+    return $pedido->tragos;
+});
+
