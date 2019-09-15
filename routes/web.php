@@ -25,3 +25,9 @@ Route::get('/pedidostrago', function () {
     $pedido->tragos()->attach(1);
 });
 
+Route::get('/userpedidos', function () {
+    $user = App\User::findOrFail(1);
+
+    return $user->pedidos;
+});
+
